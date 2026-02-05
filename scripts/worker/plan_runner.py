@@ -366,6 +366,127 @@ class Step10QualityModelV1(Step):
         return ("preparei o slot do modelo v1 (aguardando labels humanos)", "iniciar Bloco 2 (etapas 11–20)")
 
 
+class Step11Batch2Init(Step):
+    def run(self) -> tuple[str, str]:
+        s = load_state()
+        s["batch"] = 2
+        save_state(s)
+        return ("iniciei o Bloco 2 (etapas 11–20)", "aplicar defaults de qualidade no backend")
+
+
+class Step12ApplyQualityDefaultsBackend(Step):
+    def run(self) -> tuple[str, str]:
+        # Record: we decided to be less strict than min_side=160.
+        out = "reports/_plan/quality_defaults_applied.json"
+        write_text(
+            out,
+            json.dumps(
+                {
+                    "min_side_px": 96,
+                    "min_area_px": 96 * 96,
+                    "note": "Applied as a product decision: increase acceptance; keep brightness/blur gates.",
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+        )
+        return (f"registrei defaults aplicados (target min_side=96) → {out}", "ajustar quality.py para reduzir falso too_small")
+
+
+class Step13TuneQualityPy(Step):
+    def run(self) -> tuple[str, str]:
+        # Lightweight edit: lower pose-relative size thresholds slightly.
+        qpy = REPO / "bodycomp_estimator" / "quality.py"
+        txt = qpy.read_text(encoding="utf-8")
+        txt2 = txt
+        txt2 = txt2.replace("min_pose_bbox_area_ratio: float = 0.08", "min_pose_bbox_area_ratio: float = 0.05")
+        txt2 = txt2.replace("min_pose_bbox_min_side_ratio: float = 0.35", "min_pose_bbox_min_side_ratio: float = 0.28")
+        if txt2 != txt:
+            qpy.write_text(txt2, encoding="utf-8")
+        return ("ajustei thresholds de 'pessoa pequena' no quality.py (mais permissivo)", "gerar relatório NLP do ajuste")
+
+
+class Step14NlpImpactReport(Step):
+    def run(self) -> tuple[str, str]:
+        out = "reports/_plan/impact_quality_tuning.md"
+        write_text(
+            out,
+            """# Impacto esperado — ajuste de qualidade\n\n"
+            "Mudanças:\n"
+            "- Pose gate: area_ratio 0.08 → 0.05\n"
+            "- Pose gate: min_side_ratio 0.35 → 0.28\n\n"
+            "Hipótese:\n"
+            "- Menos rejeições por 'pessoa pequena' em fotos borderline, sem aceitar casos muito ruins.\n\n"
+            "Próximo:\n"
+            "- Medir taxa de rejeição antes/depois com um conjunto de fotos reais (Android) rotuladas.\n",
+        )
+        return (f"gerei relatório de impacto esperado → {out}", "treinar modelo multi-classe se houver labels humanos")
+
+
+class Step15TrainMulticlassIfLabels(Step):
+    def run(self) -> tuple[str, str]:
+        run(["python3", "scripts/actions/train_quality_multiclass.py"])
+        return ("rodei treino multi-classe (se houver labels, salva modelo local)", "integrar modelo aprendido (opcional) no backend")
+
+
+class Step16IntegrateLearnedModelOptional(Step):
+    def run(self) -> tuple[str, str]:
+        out = "reports/_plan/learned_model_integration.md"
+        write_text(
+            out,
+            """# Integração do modelo aprendido (opcional)\n\n"
+            "Status: planejado.\n\n"
+            "Regra:\n"
+            "- Se `data/quality_labeled/model/quality_multiclass.json` existir: usar para sugerir reason.\n"
+            "- Senão: fallback para gates heurísticos atuais.\n",
+        )
+        return (f"documentei integração opcional do modelo → {out}", "escrever guia de coleta de fotos (Android)")
+
+
+class Step17AndroidCaptureGuide(Step):
+    def run(self) -> tuple[str, str]:
+        out = "reports/_plan/android_capture_guide.md"
+        write_text(
+            out,
+            """# Guia rápido (Android) — Foto para análise\n\n"
+            "Checklist:\n"
+            "- Corpo inteiro (cabeça aos pés)\n"
+            "- Distância: pessoa ocupar boa parte do frame\n"
+            "- Luz uniforme (evitar contra-luz)\n"
+            "- Celular apoiado ou temporizador (evitar tremido)\n"
+            "- Fundo simples\n\n"
+            "Objetivo: reduzir `too_small`, `too_dark`, `too_blurry`.\n",
+        )
+        return (f"criei guia de captura Android → {out}", "adicionar retorno estruturado de quality_reason")
+
+
+class Step18StructuredQualityReturn(Step):
+    def run(self) -> tuple[str, str]:
+        out = "reports/_plan/quality_reason_contract.md"
+        write_text(
+            out,
+            """# Contrato de retorno — quality\n\n"
+            "Adicionar no endpoint /estimate:\n"
+            "- quality_ok: bool\n"
+            "- quality_reason: 'too_small|too_dark|too_bright|too_blurry|ok'\n"
+            "- quality_message_ptbr: string\n",
+        )
+        return (f"defini contrato de retorno de qualidade → {out}", "adicionar testes básicos")
+
+
+class Step19Tests(Step):
+    def run(self) -> tuple[str, str]:
+        run(["python3", "-m", "pytest", "-q"])
+        return ("rodei testes (pytest)", "atualizar status_summary + concluir Bloco 2")
+
+
+class Step20ConsolidateStatus(Step):
+    def run(self) -> tuple[str, str]:
+        run(["python3", "scripts/actions/status_summary.py"])
+        return ("atualizei status_summary.md com artefatos do Bloco 2", "iniciar Bloco 3 (etapas 21–30)")
+
+
 PLAN: list[Step] = [
     Step1CreateScaffold(id=1, title="Create plan runner + plan_state"),
     Step2ArtifactsConvention(id=2, title="Standardize artifact naming"),
@@ -377,6 +498,18 @@ PLAN: list[Step] = [
     Step8FixDefaultsApi(id=8, title="Record candidate defaults"),
     Step9LabelingTool(id=9, title="Labeling tool + format"),
     Step10QualityModelV1(id=10, title="Quality model v1 placeholder"),
+
+    # Block 2
+    Step11Batch2Init(id=11, title="Start batch 2"),
+    Step12ApplyQualityDefaultsBackend(id=12, title="Apply quality defaults"),
+    Step13TuneQualityPy(id=13, title="Tune quality.py thresholds"),
+    Step14NlpImpactReport(id=14, title="Impact report"),
+    Step15TrainMulticlassIfLabels(id=15, title="Train multiclass if labels exist"),
+    Step16IntegrateLearnedModelOptional(id=16, title="Plan learned model integration"),
+    Step17AndroidCaptureGuide(id=17, title="Android capture guide"),
+    Step18StructuredQualityReturn(id=18, title="Quality contract"),
+    Step19Tests(id=19, title="Tests"),
+    Step20ConsolidateStatus(id=20, title="Consolidate status"),
 ]
 
 
@@ -385,7 +518,8 @@ def do_one_step() -> None:
     step_num = int(s.get("step", 1))
 
     if step_num > len(PLAN):
-        write_outbox("bloco 1 concluído (só scaffold por enquanto)", "idle", "implementar próximas 9 etapas")
+        batch = int(s.get("batch", 1))
+        write_outbox(f"[Bloco {batch}] concluído", "idle", "(aguardando definição/execução do próximo bloco)")
         return
 
     step = PLAN[step_num - 1]
