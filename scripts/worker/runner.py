@@ -88,41 +88,42 @@ def append_action_log(tick: int, action: str, next_action: str, ok: bool, extra:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
 
-def action_roi_list_from_keypoints() -> tuple[str, str]:
-    """(summary, next_action)"""
-    ann = REPO / "data" / "datasets" / "coco2017" / "annotations" / "person_keypoints_val2017.json"
-    out = REPO / "reports" / "coco_val2017_roi_from_keypoints.jsonl"
-    out.parent.mkdir(parents=True, exist_ok=True)
+def action_roi_list_from_keypoints(pad_frac: float = 0.15) -> tuple[str, str]:
+    """(summary, next_action)
 
-    if not ann.exists():
-        return ("faltou annotations person_keypoints_val2017.json", "baixar/descompactar annotations")
+    Uses the dedicated script so ROI format stays consistent.
+    """
+    import subprocess
 
-    data = json.loads(ann.read_text(encoding="utf-8"))
-    anns = data.get("annotations", [])
-    img_by_id = {im["id"]: im for im in data.get("images", [])}
+    cmd = [
+        "python3",
+        "scripts/actions/coco_val_roi_from_keypoints.py",
+        "--pad-frac",
+        str(pad_frac),
+    ]
+    r = subprocess.run(cmd, cwd=str(REPO), capture_output=True, text=True)
+    if r.returncode != 0:
+        return (f"erro ao gerar ROI (pad={pad_frac})", "investigar coco_val_roi_from_keypoints.py")
 
-    kept = 0
-    with out.open("w", encoding="utf-8") as f:
-        for a in anns:
-            # Only persons with keypoints
-            if a.get("num_keypoints", 0) <= 0:
-                continue
-            img = img_by_id.get(a["image_id"])
-            if not img:
-                continue
-            x, y, w, h = a.get("bbox", [0, 0, 0, 0])
-            if w <= 1 or h <= 1:
-                continue
-            rec = {
-                "image_id": a["image_id"],
-                "file_name": img.get("file_name"),
-                "bbox": [x, y, w, h],
-                "num_keypoints": a.get("num_keypoints"),
-            }
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-            kept += 1
+    return (
+        f"gerei ROIs via keypoints (pad={pad_frac})",
+        "rodar pose em ROI sample 1000 e comparar vs full",
+    )
 
-    return (f"gerei lista ROI ({kept} bboxes) via keypoints", "rerun pose em crops ROI (amostra 200) + summary")
+
+def action_quality_gates(n: int = 1000) -> tuple[str, str]:
+    import subprocess
+
+    cmd = ["python3", "scripts/actions/quality_gates_eval.py", "--n", str(n)]
+    r = subprocess.run(cmd, cwd=str(REPO), capture_output=True, text=True)
+    if r.returncode != 0:
+        return ("erro em quality gates", "ver logs/traceback")
+
+    # Parse report headline quickly
+    md = (REPO / "reports" / "quality_eval.md").read_text(encoding="utf-8")
+    ok_line = next((l for l in md.splitlines() if l.startswith("- ok:")), "- ok: ?")
+    rej_line = next((l for l in md.splitlines() if l.startswith("- reject:")), "- reject: ?")
+    return (f"quality gates {ok_line} {rej_line}", "ajustar ROI pad e rerodar quality gates")
 
 
 def action_rerun_pose_on_roi_sample(n: int = 200, seed: int = 42) -> tuple[str, str]:
@@ -275,13 +276,16 @@ def do_one_action(s: State) -> State:
     s.tick += 1
     s.last_tick_at_ms = now_ms()
 
-    na = s.next_action.lower()
-    if na.startswith("roi crop") or "roi" in na and "pose" not in na:
-        summary, nxt = action_roi_list_from_keypoints()
-    elif "pose" in na or "quality" in na or "gates" in na:
-        summary, nxt = action_rerun_pose_on_roi_sample(n=1000 if ("1000" in na) else 200)
+    # Simple autonomous scheduler (no user input):
+    # - every 5 ticks: regenerate ROI list (alternate pad)
+    # - every 2 ticks: alternate pose eval and quality gates
+    if s.tick % 5 == 0:
+        pad = 0.15 if (s.tick // 5) % 2 == 0 else 0.25
+        summary, nxt = action_roi_list_from_keypoints(pad_frac=pad)
+    elif s.tick % 2 == 0:
+        summary, nxt = action_quality_gates(n=1000)
     else:
-        summary, nxt = ("sem ação mapeada; mantive plano", "Implement rerun pose on ROI crops (sample 200) + write summary report")
+        summary, nxt = action_rerun_pose_on_roi_sample(n=1000)
 
     s.last_action = summary
     s.next_action = nxt
