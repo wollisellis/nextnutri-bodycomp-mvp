@@ -399,7 +399,9 @@ def do_one_step() -> None:
         save_state(s)
 
         append_log({"ts": time.time(), "step": step.id, "title": step.title, "ok": True, "did": did, "next": nxt})
-        write_outbox(did, "idle", nxt)
+
+        batch = int(s.get("batch", 1))
+        write_outbox(f"[Bloco {batch} | Etapa {step.id}/10] {did}", "idle", nxt)
 
     except Exception as e:
         tb = traceback.format_exc()
