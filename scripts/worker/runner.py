@@ -225,6 +225,52 @@ def action_rerun_pose_on_roi_sample(n: int = 200, seed: int = 42) -> tuple[str, 
     return (f"rodei pose em ROI sample {len(sample)} (ok={ok}, no_pose={no_pose})", "aumentar sample p/ 1000 + quality gates")
 
 
+def maybe_milestone_commit(tick: int) -> None:
+    """Every N ticks, try to create a lightweight milestone commit + push.
+
+    Best-effort: never crash the worker.
+    """
+
+    if tick % 25 != 0:
+        return
+
+    try:
+        import subprocess
+
+        subprocess.run(
+            ["git", "add", "backend", "bodycomp_estimator", "scripts", "reports", ".gitignore"],
+            cwd=str(REPO),
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        # Only commit if there is something staged/changed.
+        r = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=str(REPO),
+            check=False,
+        )
+        if r.returncode == 0:
+            return
+
+        subprocess.run(
+            ["git", "commit", "-m", f"Milestone: worker tick {tick}"],
+            cwd=str(REPO),
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        subprocess.run(
+            ["git", "push"],
+            cwd=str(REPO),
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return
+
+
 def do_one_action(s: State) -> State:
     s.tick += 1
     s.last_tick_at_ms = now_ms()
@@ -242,6 +288,7 @@ def do_one_action(s: State) -> State:
     save_state(s)
 
     append_action_log(tick=s.tick, action=summary, next_action=nxt, ok=True)
+    maybe_milestone_commit(s.tick)
 
     write_outbox(
         mudou=summary,

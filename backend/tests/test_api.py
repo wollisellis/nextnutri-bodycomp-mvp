@@ -16,8 +16,12 @@ def client() -> TestClient:
 
 
 def _make_test_image() -> bytes:
-    # Simple RGB image; pose extractor will be monkeypatched.
-    img = Image.fromarray(np.zeros((64, 64, 3), dtype=np.uint8), mode="RGB")
+    # Simple bright RGB image; pose extractor will be monkeypatched.
+    arr = np.full((64, 64, 3), 140, dtype=np.uint8)
+    # Add a simple pattern so blur gate doesn't reject a uniform image.
+    arr[::4, :, :] = 40
+    arr[:, ::4, :] = 200
+    img = Image.fromarray(arr, mode="RGB")
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     return buf.getvalue()

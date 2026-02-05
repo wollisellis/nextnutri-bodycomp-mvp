@@ -10,6 +10,7 @@ from PIL import Image
 from bodycomp_estimator.estimator import estimate_body_fat_percent
 from bodycomp_estimator.pose import PoseExtractor
 from bodycomp_estimator.schemas import SubjectMetadata
+from bodycomp_estimator.quality import quality_gate_message
 
 app = FastAPI(title="NextNutri BodyComp MVP", version="0.1.0")
 
@@ -48,15 +49,25 @@ async def estimate(
 
     image_rgb = np.array(pil)
 
+    # Fast quality gates before pose (blur/light).
+    msg = quality_gate_message(image_rgb)
+    if msg is not None:
+        raise HTTPException(status_code=422, detail=msg)
+
     pose = pose_extractor.extract(image_rgb)
     if pose is None:
         raise HTTPException(
             status_code=422,
             detail=(
-                "No pose detected. Use a clear, well-lit full-body photo (head-to-feet), "
-                "standing upright, minimal occlusion."
+                "Não detectei pose. Use uma foto de corpo inteiro (cabeça aos pés), "
+                "bem iluminada, em pé, sem oclusões (braços colados no corpo ajudam)."
             ),
         )
+
+    # Post-pose gate: person too small in frame.
+    msg2 = quality_gate_message(image_rgb, pose_xy_norm=pose.xy)
+    if msg2 is not None:
+        raise HTTPException(status_code=422, detail=msg2)
 
     sex_norm = sex.lower().strip()
     if sex_norm not in {"female", "male", "unknown"}:
