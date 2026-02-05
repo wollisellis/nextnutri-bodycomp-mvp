@@ -1,7 +1,7 @@
 # Status Summary — NextNutri BodyComp MVP
 
-Gerado em: **2026-02-05 13:07:35 UTC**
-Git: **main @ 119d417**
+Gerado em: **2026-02-05 14:13:43 UTC**
+Git: **main @ 0cbba79**
 
 ## Dataset (COCO 2017)
 - train2017: **118.287** imagens
@@ -11,27 +11,27 @@ Git: **main @ 119d417**
 - `df -h /`: `/dev/sda1        99G   33G   62G  35% /`
 
 ## Worker (estado)
-- tick: **164**
-- última ação: **quality gates - ok: **247** - reject: **753****
-- próxima ação: **ajustar ROI pad e rerodar quality gates**
+- tick: **215**
+- última ação: **gerei ROIs via keypoints (pad=0.25)**
+- próxima ação: **rodar pose em ROI sample 1000 e comparar vs full**
 
 ## Últimas ações (log)
-- tick 164 [ok]: quality gates - ok: **247** - reject: **753** → próximo: ajustar ROI pad e rerodar quality gates
-- tick 163 [ok]: rodei pose em ROI sample 1000 (ok=653, no_pose=347) → próximo: aumentar sample p/ 1000 + quality gates
-- tick 162 [ok]: quality gates - ok: **210** - reject: **790** → próximo: ajustar ROI pad e rerodar quality gates
-- tick 161 [ok]: rodei pose em ROI sample 1000 (ok=615, no_pose=385) → próximo: aumentar sample p/ 1000 + quality gates
-- tick 160 [ok]: gerei ROIs via keypoints (pad=0.15) → próximo: rodar pose em ROI sample 1000 e comparar vs full
-- tick 159 [ok]: rodei pose em ROI sample 1000 (ok=653, no_pose=347) → próximo: aumentar sample p/ 1000 + quality gates
-- tick 158 [ok]: quality gates - ok: **247** - reject: **753** → próximo: ajustar ROI pad e rerodar quality gates
-- tick 157 [ok]: rodei pose em ROI sample 1000 (ok=653, no_pose=347) → próximo: aumentar sample p/ 1000 + quality gates
-- tick 156 [ok]: quality gates - ok: **247** - reject: **753** → próximo: ajustar ROI pad e rerodar quality gates
-- tick 155 [ok]: gerei ROIs via keypoints (pad=0.25) → próximo: rodar pose em ROI sample 1000 e comparar vs full
-- tick 154 [ok]: quality gates - ok: **281** - reject: **719** → próximo: ajustar ROI pad e rerodar quality gates
-- tick 153 [ok]: rodei pose em ROI sample 1000 (ok=673, no_pose=327) → próximo: aumentar sample p/ 1000 + quality gates
+- tick 215 [ok]: gerei ROIs via keypoints (pad=0.25) → próximo: rodar pose em ROI sample 1000 e comparar vs full
+- tick 214 [ok]: quality gates - ok: **210** - reject: **790** → próximo: ajustar ROI pad e rerodar quality gates
+- tick 213 [ok]: rodei pose em ROI sample 1000 (ok=615, no_pose=385) → próximo: aumentar sample p/ 1000 + quality gates
+- tick 212 [ok]: quality gates - ok: **210** - reject: **790** → próximo: ajustar ROI pad e rerodar quality gates
+- tick 211 [ok]: rodei pose em ROI sample 1000 (ok=615, no_pose=385) → próximo: aumentar sample p/ 1000 + quality gates
+- tick 210 [ok]: gerei ROIs via keypoints (pad=0.15) → próximo: rodar pose em ROI sample 1000 e comparar vs full
+- tick 209 [ok]: rodei pose em ROI sample 1000 (ok=653, no_pose=347) → próximo: aumentar sample p/ 1000 + quality gates
+- tick 208 [ok]: quality gates - ok: **247** - reject: **753** → próximo: ajustar ROI pad e rerodar quality gates
+- tick 207 [ok]: rodei pose em ROI sample 1000 (ok=653, no_pose=347) → próximo: aumentar sample p/ 1000 + quality gates
+- tick 206 [ok]: quality gates - ok: **247** - reject: **753** → próximo: ajustar ROI pad e rerodar quality gates
+- tick 205 [ok]: gerei ROIs via keypoints (pad=0.25) → próximo: rodar pose em ROI sample 1000 e comparar vs full
+- tick 204 [ok]: quality gates - ok: **210** - reject: **790** → próximo: ajustar ROI pad e rerodar quality gates
 
 ## Artefatos recentes
-- Quality gates (mais recente): `reports/quality_eval_train_n1000.md`
-- Quality gates (dados): `reports/quality_eval_train_n1000.jsonl`
+- Quality gates (mais recente): `reports/quality_eval.md`
+- Quality gates (dados): `reports/quality_eval.jsonl`
 - Quality gates (train n=1000): `reports/quality_eval_train_n1000.md`
 - Quality gates (val n=1000): `reports/quality_eval_n1000.md`
 - ROI vs Full (val): `reports/coco_val2017_pose_roi_vs_full.md`
