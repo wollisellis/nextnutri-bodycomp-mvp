@@ -29,6 +29,7 @@ sys.path.insert(0, str(REPO))
 STATE_PATH = REPO / "reports" / "worker_state.json"
 OUTBOX_PATH = REPO / "reports" / "outbox_telegram.txt"
 ERROR_PATH = REPO / "reports" / "worker_last_error.txt"
+ACTIONS_LOG_PATH = REPO / "reports" / "actions_log.jsonl"
 
 
 @dataclass
@@ -70,6 +71,21 @@ def save_state(s: State) -> None:
 
 def write_outbox(mudou: str, rodando: str, proximo: str) -> None:
     OUTBOX_PATH.write_text(f"Mudou: {mudou}\nRodando: {rodando}\nPróximo: {proximo}\n", encoding="utf-8")
+
+
+def append_action_log(tick: int, action: str, next_action: str, ok: bool, extra: dict | None = None) -> None:
+    rec = {
+        "ts": time.time(),
+        "tick": tick,
+        "ok": ok,
+        "action": action,
+        "next": next_action,
+    }
+    if extra:
+        rec.update(extra)
+    ACTIONS_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with ACTIONS_LOG_PATH.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
 
 def action_roi_list_from_keypoints() -> tuple[str, str]:
@@ -134,12 +150,19 @@ def action_rerun_pose_on_roi_sample(n: int = 200, seed: int = 42) -> tuple[str, 
 
     with out_jsonl.open("w", encoding="utf-8") as f:
         for r in sample:
-            fn = r.get("file_name") or r.get("file")
+            fn = r.get("file_name") or r.get("file") or ""
             bbox = r.get("bbox") or r.get("roi_xywh") or r.get("bbox_xywh")
-            rec = {"file": fn, "bbox": bbox}
+            rec = {"file": fn or None, "bbox": bbox}
 
-            if not fn:
+            if not isinstance(fn, str) or not fn.strip():
                 rec["status"] = "missing_file_name"
+                read_fail += 1
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                continue
+            fn = fn.strip()
+
+            if not (isinstance(bbox, (list, tuple)) and len(bbox) == 4):
+                rec["status"] = "missing_or_invalid_bbox"
                 read_fail += 1
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 continue
@@ -218,6 +241,8 @@ def do_one_action(s: State) -> State:
     s.next_action = nxt
     save_state(s)
 
+    append_action_log(tick=s.tick, action=summary, next_action=nxt, ok=True)
+
     write_outbox(
         mudou=summary,
         rodando="idle",
@@ -239,6 +264,12 @@ def main() -> int:
                 ERROR_PATH.write_text(tb, encoding="utf-8")
             except Exception:
                 pass
+            append_action_log(
+                tick=load_state().tick,
+                action=f"erro: {type(e).__name__}",
+                next_action="investigar traceback",
+                ok=False,
+            )
             write_outbox(
                 mudou=f"erro: {type(e).__name__}",
                 rodando="idle",
