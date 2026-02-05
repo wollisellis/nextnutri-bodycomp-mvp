@@ -23,5 +23,5 @@ Sample: **1000**
 - too_blurry: Foto tremida/desfocada. Apoie o celular, use temporizador e tente de novo.
 
 Artifacts:
-- reports/quality_eval.jsonl
-- reports/quality_eval.md
+- reports/quality_eval_pad025.jsonl
+- reports/quality_eval_pad025.md

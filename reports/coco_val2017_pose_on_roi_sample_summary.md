@@ -1,7 +1,7 @@
 # COCO val2017 — Pose on ROI sample
 - Sample: 1000
-- OK: 615
-- No pose: 385
+- OK: 653
+- No pose: 347
 - Read/crop fail: 0
 
 Artifacts:
