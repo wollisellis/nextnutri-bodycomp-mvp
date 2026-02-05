@@ -192,20 +192,28 @@ class Step6DeltaTrainVsVal(Step):
         tr = parse_quality_md("reports/quality_eval_train_pad025_n5000.md")
         va = parse_quality_md("reports/quality_eval_val_pad025_n5000.md")
         out = "reports/delta_train_vs_val_pad025.md"
-        write_text(
-            out,
-            """# Delta — Train vs Val (pad=0.25)\n\n"
-            "## Summary\n"
-            f"- train: ok={tr.get('ok')} reject={tr.get('reject')}\n"
-            f"- val:   ok={va.get('ok')} reject={va.get('reject')}\n\n"
-            "## Top reject reasons (train)\n"
-            + "\n".join([f"- {k}: {v}" for k, v in sorted(tr.get("reasons", {}).items())])
-            + "\n\n## Top reject reasons (val)\n"
-            + "\n".join([f"- {k}: {v}" for k, v in sorted(va.get("reasons", {}).items())])
-            + "\n\n## Interpretação\n"
-            "- Se `too_small` dominar nos dois splits, o gargalo é enquadramento/tamanho do ROI.\n"
-            "- A próxima etapa é sweep de thresholds para aumentar aceitação sem perder qualidade.\n",
-        )
+        lines = [
+            "# Delta — Train vs Val (pad=0.25)",
+            "",
+            "## Summary",
+            f"- train: ok={tr.get('ok')} reject={tr.get('reject')}",
+            f"- val:   ok={va.get('ok')} reject={va.get('reject')}",
+            "",
+            "## Top reject reasons (train)",
+        ]
+        for k, v in sorted(tr.get("reasons", {}).items()):
+            lines.append(f"- {k}: {v}")
+        lines += ["", "## Top reject reasons (val)"]
+        for k, v in sorted(va.get("reasons", {}).items()):
+            lines.append(f"- {k}: {v}")
+        lines += [
+            "",
+            "## Interpretação",
+            "- Se `too_small` dominar nos dois splits, o gargalo é enquadramento/tamanho do ROI.",
+            "- A próxima etapa é sweep de thresholds para aumentar aceitação sem perder qualidade.",
+            "",
+        ]
+        write_text(out, "\n".join(lines))
         return (f"gerei delta train vs val → {out}", "rodar sweep de thresholds")
 
 
@@ -275,11 +283,17 @@ class Step9LabelingTool(Step):
     def run(self) -> tuple[str, str]:
         write_text(
             "data/quality_labeled/README.md",
-            """# Quality labeled dataset (local only)\n\n"
-            "Estrutura:\n- images/  (NÃO versionar)\n- labels.jsonl\n\n"
-            "Formato labels.jsonl (1 por linha):\n"
-            "{\"file\": \"images/xxx.jpg\", \"label\": \"ok|too_dark|too_bright|too_blurry|too_small\", \"note\": \"...\"}\n\n"
-            "Privacidade: manter local (não subir).\n",
+            """# Quality labeled dataset (local only)
+
+Estrutura:
+- images/  (NÃO versionar)
+- labels.jsonl
+
+Formato labels.jsonl (1 por linha):
+{"file": "images/xxx.jpg", "label": "ok|too_dark|too_bright|too_bright|too_small", "note": "..."}
+
+Privacidade: manter local (não subir).
+""",
         )
         write_text(
             "scripts/label_quality_cli.py",
@@ -345,12 +359,9 @@ class Step10QualityModelV1(Step):
         # Pipeline placeholder: in the next batch we will train on human labels.
         write_text(
             "reports/quality_model_v1.md",
-            """# Quality model v1
-
-Status: pipeline pronto para treinar com rótulos humanos.
-
-Próximo: coletar 200–500 fotos rotuladas e treinar classificador (multi-classe).
-""",
+            "# Quality model v1\n\n"
+            "Status: pipeline pronto para treinar com rótulos humanos.\n\n"
+            "Proximo: coletar 200-500 fotos rotuladas e treinar classificador (multi-classe).\n",
         )
         return ("preparei o slot do modelo v1 (aguardando labels humanos)", "iniciar Bloco 2 (etapas 11–20)")
 
