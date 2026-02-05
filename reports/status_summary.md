@@ -1,7 +1,7 @@
 # Status Summary — NextNutri BodyComp MVP
 
-Gerado em: **2026-02-05 13:03:19 UTC**
-Git: **main @ 292b8c3**
+Gerado em: **2026-02-05 13:07:35 UTC**
+Git: **main @ 119d417**
 
 ## Dataset (COCO 2017)
 - train2017: **118.287** imagens
@@ -11,11 +11,14 @@ Git: **main @ 292b8c3**
 - `df -h /`: `/dev/sda1        99G   33G   62G  35% /`
 
 ## Worker (estado)
-- tick: **161**
-- última ação: **rodei pose em ROI sample 1000 (ok=615, no_pose=385)**
-- próxima ação: **aumentar sample p/ 1000 + quality gates**
+- tick: **164**
+- última ação: **quality gates - ok: **247** - reject: **753****
+- próxima ação: **ajustar ROI pad e rerodar quality gates**
 
 ## Últimas ações (log)
+- tick 164 [ok]: quality gates - ok: **247** - reject: **753** → próximo: ajustar ROI pad e rerodar quality gates
+- tick 163 [ok]: rodei pose em ROI sample 1000 (ok=653, no_pose=347) → próximo: aumentar sample p/ 1000 + quality gates
+- tick 162 [ok]: quality gates - ok: **210** - reject: **790** → próximo: ajustar ROI pad e rerodar quality gates
 - tick 161 [ok]: rodei pose em ROI sample 1000 (ok=615, no_pose=385) → próximo: aumentar sample p/ 1000 + quality gates
 - tick 160 [ok]: gerei ROIs via keypoints (pad=0.15) → próximo: rodar pose em ROI sample 1000 e comparar vs full
 - tick 159 [ok]: rodei pose em ROI sample 1000 (ok=653, no_pose=347) → próximo: aumentar sample p/ 1000 + quality gates
@@ -25,13 +28,12 @@ Git: **main @ 292b8c3**
 - tick 155 [ok]: gerei ROIs via keypoints (pad=0.25) → próximo: rodar pose em ROI sample 1000 e comparar vs full
 - tick 154 [ok]: quality gates - ok: **281** - reject: **719** → próximo: ajustar ROI pad e rerodar quality gates
 - tick 153 [ok]: rodei pose em ROI sample 1000 (ok=673, no_pose=327) → próximo: aumentar sample p/ 1000 + quality gates
-- tick 152 [ok]: quality gates - ok: **210** - reject: **790** → próximo: ajustar ROI pad e rerodar quality gates
-- tick 151 [ok]: rodei pose em ROI sample 1000 (ok=615, no_pose=385) → próximo: aumentar sample p/ 1000 + quality gates
-- tick 150 [ok]: gerei ROIs via keypoints (pad=0.15) → próximo: rodar pose em ROI sample 1000 e comparar vs full
 
 ## Artefatos recentes
-- Quality gates (mais recente): `reports/quality_eval_pad025_rerun.md`
-- Quality gates (dados): `reports/quality_eval_pad025_rerun.jsonl`
+- Quality gates (mais recente): `reports/quality_eval_train_n1000.md`
+- Quality gates (dados): `reports/quality_eval_train_n1000.jsonl`
+- Quality gates (train n=1000): `reports/quality_eval_train_n1000.md`
+- Quality gates (val n=1000): `reports/quality_eval_n1000.md`
 - ROI vs Full (val): `reports/coco_val2017_pose_roi_vs_full.md`
 
 ## Leitura humana (o que isso significa)

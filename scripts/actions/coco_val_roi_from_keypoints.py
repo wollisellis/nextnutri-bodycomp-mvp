@@ -1,4 +1,4 @@
-"""COCO val2017 ROI from person keypoints annotations.
+"""COCO ROI from person keypoints annotations (train2017 or val2017).
 
 Purpose
 - Build a reproducible ROI (crop box) per COCO person instance using the
@@ -7,7 +7,7 @@ Purpose
   results vs full-frame.
 
 Outputs
-- reports/coco_val2017_roi_from_keypoints.jsonl
+- reports/coco_<split>2017_roi_from_keypoints.jsonl
 
 Each record is one person annotation with:
 - image_id, ann_id
@@ -18,10 +18,11 @@ Each record is one person annotation with:
 
 Usage
   . .venv/bin/activate
-  python scripts/actions/coco_val_roi_from_keypoints.py \
-    --ann data/datasets/coco2017/annotations/person_keypoints_val2017.json \
-    --images-dir data/datasets/coco2017/val2017 \
-    --pad-frac 0.15
+  # val
+  python scripts/actions/coco_val_roi_from_keypoints.py --split val --pad-frac 0.15
+
+  # train
+  python scripts/actions/coco_val_roi_from_keypoints.py --split train --pad-frac 0.15
 """
 
 from __future__ import annotations
@@ -66,27 +67,49 @@ def _xywh_from_kps(keypoints: list[float], pad_frac: float) -> tuple[float, floa
 
 def main() -> int:
     p = argparse.ArgumentParser()
+    p.add_argument("--split", choices=["train", "val"], default="val", help="Which COCO 2017 split to use")
     p.add_argument(
         "--ann",
-        default="data/datasets/coco2017/annotations/person_keypoints_val2017.json",
-        help="Path to COCO person_keypoints_val2017.json",
+        default="",
+        help="Path to COCO person_keypoints_<split>2017.json (optional; inferred from --split if empty)",
     )
     p.add_argument(
         "--images-dir",
-        default="data/datasets/coco2017/val2017",
-        help="Directory containing val2017 .jpg files (for relative paths)",
+        default="",
+        help="Directory containing <split>2017 .jpg files (optional; inferred from --split if empty)",
     )
     p.add_argument("--pad-frac", type=float, default=0.15)
     p.add_argument("--limit", type=int, default=0, help="If >0, limit number of annotations processed")
+    p.add_argument(
+        "--out-jsonl",
+        default="",
+        help="Output path (optional; default: reports/coco_<split>2017_roi_from_keypoints.jsonl)",
+    )
     args = p.parse_args()
 
     repo_root = Path(__file__).resolve().parents[2]
-    ann_path = (repo_root / args.ann).resolve()
-    images_dir = (repo_root / args.images_dir).resolve()
+
+    split = str(args.split)
+    if args.ann:
+        ann_rel = args.ann
+    else:
+        ann_rel = f"data/datasets/coco2017/annotations/person_keypoints_{split}2017.json"
+
+    if args.images_dir:
+        images_rel = args.images_dir
+    else:
+        images_rel = f"data/datasets/coco2017/{split}2017"
+
+    ann_path = (repo_root / ann_rel).resolve()
+    images_dir = (repo_root / images_rel).resolve()
+
     report_dir = repo_root / "reports"
     report_dir.mkdir(parents=True, exist_ok=True)
 
-    out_path = report_dir / "coco_val2017_roi_from_keypoints.jsonl"
+    if args.out_jsonl:
+        out_path = (repo_root / args.out_jsonl).resolve()
+    else:
+        out_path = report_dir / f"coco_{split}2017_roi_from_keypoints.jsonl"
 
     data: dict[str, Any] = json.loads(ann_path.read_text(encoding="utf-8"))
     images = {int(img["id"]): img for img in data.get("images", [])}

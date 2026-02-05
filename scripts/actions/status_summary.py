@@ -79,6 +79,10 @@ def main() -> int:
         if cand.exists():
             newest_quality_jsonl = cand
 
+    # Also: keep explicit pointers if we have both splits
+    q_train = REPORTS / "quality_eval_train_n1000.md"
+    q_val = REPORTS / "quality_eval_n1000.md"
+
     # Optional: other known reports
     compare_roi_full = REPORTS / "coco_val2017_pose_roi_vs_full.md"
 
@@ -130,6 +134,10 @@ def main() -> int:
         lines.append(f"- Quality gates (mais recente): `{newest_quality_md.relative_to(REPO)}`")
     if newest_quality_jsonl:
         lines.append(f"- Quality gates (dados): `{newest_quality_jsonl.relative_to(REPO)}`")
+    if q_train.exists():
+        lines.append(f"- Quality gates (train n=1000): `{q_train.relative_to(REPO)}`")
+    if q_val.exists():
+        lines.append(f"- Quality gates (val n=1000): `{q_val.relative_to(REPO)}`")
     if compare_roi_full.exists():
         lines.append(f"- ROI vs Full (val): `{compare_roi_full.relative_to(REPO)}`")
     lines.append("")

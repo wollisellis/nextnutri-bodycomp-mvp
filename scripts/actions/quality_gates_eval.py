@@ -37,11 +37,18 @@ def load_jsonl(path: Path) -> list[dict]:
     return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
-def resolve_img_path(fn: str) -> Path:
+def resolve_img_path(fn: str, images_dir: Path | None = None) -> Path:
+    """Resolve an image path.
+
+    - If fn contains '/', treat as repo-relative path.
+    - Else, join with images_dir if provided; otherwise default to COCO val2017.
+    """
+
     coco_val = REPO / "data" / "datasets" / "coco2017" / "val2017"
     if "/" in fn:
         return (REPO / fn).resolve()
-    return coco_val / fn
+    base = images_dir if images_dir is not None else coco_val
+    return base / fn
 
 
 @dataclass
@@ -76,6 +83,7 @@ def clamp_bbox(xywh, w_img: int, h_img: int):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--roi-jsonl", default="reports/coco_val2017_roi_from_keypoints.jsonl")
+    ap.add_argument("--images-dir", default="", help="Optional: directory for basename-only file names")
     ap.add_argument("--n", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=42)
 
@@ -93,6 +101,10 @@ def main() -> int:
 
     roi_path = (REPO / args.roi_jsonl).resolve()
     rows = load_jsonl(roi_path)
+
+    images_dir = None
+    if args.images_dir:
+        images_dir = (REPO / args.images_dir).resolve()
 
     random.seed(args.seed)
     sample = random.sample(rows, k=min(args.n, len(rows)))
@@ -127,7 +139,7 @@ def main() -> int:
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 continue
 
-            img_path = resolve_img_path(fn)
+            img_path = resolve_img_path(fn, images_dir=images_dir)
             bgr = cv2.imread(str(img_path), cv2.IMREAD_COLOR)
             if bgr is None:
                 rec["gate"] = "read_fail"
