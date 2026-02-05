@@ -8,12 +8,12 @@ Sample: **1000**
 - min_lap_var: 80.0
 
 ## Results
-- ok: **210**
-- reject: **790**
+- ok: **247**
+- reject: **753**
 
 ### Reject reasons
-- too_small: 775
-- too_dark: 13
+- too_small: 733
+- too_dark: 18
 - too_blurry: 2
 
 ## Suggested user-facing messages (PT-BR)
@@ -23,5 +23,5 @@ Sample: **1000**
 - too_blurry: Foto tremida/desfocada. Apoie o celular, use temporizador e tente de novo.
 
 Artifacts:
-- reports/quality_eval.jsonl
-- reports/quality_eval.md
+- reports/quality_eval_pad025_rerun.jsonl
+- reports/quality_eval_pad025_rerun.md
