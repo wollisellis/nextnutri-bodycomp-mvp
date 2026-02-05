@@ -412,16 +412,16 @@ class Step14NlpImpactReport(Step):
         out = "reports/_plan/impact_quality_tuning.md"
         write_text(
             out,
-            """# Impacto esperado — ajuste de qualidade\n\n"
-            "Mudanças:\n"
-            "- Pose gate: area_ratio 0.08 → 0.05\n"
-            "- Pose gate: min_side_ratio 0.35 → 0.28\n\n"
-            "Hipótese:\n"
-            "- Menos rejeições por 'pessoa pequena' em fotos borderline, sem aceitar casos muito ruins.\n\n"
-            "Próximo:\n"
-            "- Medir taxa de rejeição antes/depois com um conjunto de fotos reais (Android) rotuladas.\n",
+            "# Impacto esperado — ajuste de qualidade\n\n"
+            "Mudancas:\n"
+            "- Pose gate: area_ratio 0.08 -> 0.05\n"
+            "- Pose gate: min_side_ratio 0.35 -> 0.28\n\n"
+            "Hipotese:\n"
+            "- Menos rejeicoes por 'pessoa pequena' em fotos borderline, sem aceitar casos muito ruins.\n\n"
+            "Proximo:\n"
+            "- Medir taxa de rejeicao antes/depois com um conjunto de fotos reais (Android) rotuladas.\n",
         )
-        return (f"gerei relatório de impacto esperado → {out}", "treinar modelo multi-classe se houver labels humanos")
+        return (f"gerei relatorio de impacto esperado -> {out}", "treinar modelo multi-classe se houver labels humanos")
 
 
 class Step15TrainMulticlassIfLabels(Step):
@@ -435,13 +435,13 @@ class Step16IntegrateLearnedModelOptional(Step):
         out = "reports/_plan/learned_model_integration.md"
         write_text(
             out,
-            """# Integração do modelo aprendido (opcional)\n\n"
+            "# Integracao do modelo aprendido (opcional)\n\n"
             "Status: planejado.\n\n"
             "Regra:\n"
-            "- Se `data/quality_labeled/model/quality_multiclass.json` existir: usar para sugerir reason.\n"
-            "- Senão: fallback para gates heurísticos atuais.\n",
+            "- Se data/quality_labeled/model/quality_multiclass.json existir: usar para sugerir reason.\n"
+            "- Senao: fallback para gates heurísticos atuais.\n",
         )
-        return (f"documentei integração opcional do modelo → {out}", "escrever guia de coleta de fotos (Android)")
+        return (f"documentei integracao opcional do modelo -> {out}", "escrever guia de coleta de fotos (Android)")
 
 
 class Step17AndroidCaptureGuide(Step):
@@ -449,16 +449,16 @@ class Step17AndroidCaptureGuide(Step):
         out = "reports/_plan/android_capture_guide.md"
         write_text(
             out,
-            """# Guia rápido (Android) — Foto para análise\n\n"
+            "# Guia rapido (Android) — Foto para analise\n\n"
             "Checklist:\n"
-            "- Corpo inteiro (cabeça aos pés)\n"
-            "- Distância: pessoa ocupar boa parte do frame\n"
+            "- Corpo inteiro (cabeca aos pes)\n"
+            "- Distancia: pessoa ocupar boa parte do frame\n"
             "- Luz uniforme (evitar contra-luz)\n"
             "- Celular apoiado ou temporizador (evitar tremido)\n"
             "- Fundo simples\n\n"
-            "Objetivo: reduzir `too_small`, `too_dark`, `too_blurry`.\n",
+            "Objetivo: reduzir too_small / too_dark / too_blurry.\n",
         )
-        return (f"criei guia de captura Android → {out}", "adicionar retorno estruturado de quality_reason")
+        return (f"criei guia de captura Android -> {out}", "adicionar retorno estruturado de quality_reason")
 
 
 class Step18StructuredQualityReturn(Step):
@@ -466,13 +466,13 @@ class Step18StructuredQualityReturn(Step):
         out = "reports/_plan/quality_reason_contract.md"
         write_text(
             out,
-            """# Contrato de retorno — quality\n\n"
+            "# Contrato de retorno — quality\n\n"
             "Adicionar no endpoint /estimate:\n"
             "- quality_ok: bool\n"
-            "- quality_reason: 'too_small|too_dark|too_bright|too_blurry|ok'\n"
+            "- quality_reason: too_small|too_dark|too_bright|too_blurry|ok\n"
             "- quality_message_ptbr: string\n",
         )
-        return (f"defini contrato de retorno de qualidade → {out}", "adicionar testes básicos")
+        return (f"defini contrato de retorno de qualidade -> {out}", "adicionar testes basicos")
 
 
 class Step19Tests(Step):
