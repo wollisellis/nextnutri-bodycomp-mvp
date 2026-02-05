@@ -78,6 +78,17 @@ def main() -> int:
     ap.add_argument("--roi-jsonl", default="reports/coco_val2017_roi_from_keypoints.jsonl")
     ap.add_argument("--n", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=42)
+
+    # Gates (override defaults from code)
+    ap.add_argument("--min-side-px", type=int, default=160)
+    ap.add_argument("--min-area-px", type=int, default=160 * 160)
+    ap.add_argument("--min-brightness", type=float, default=60.0)
+    ap.add_argument("--max-brightness", type=float, default=215.0)
+    ap.add_argument("--min-lap-var", type=float, default=80.0)
+
+    # Output naming (avoid overwriting when sweeping thresholds)
+    ap.add_argument("--out-stem", default="quality_eval", help="Writes reports/<out-stem>.jsonl and .md")
+
     args = ap.parse_args()
 
     roi_path = (REPO / args.roi_jsonl).resolve()
@@ -86,10 +97,16 @@ def main() -> int:
     random.seed(args.seed)
     sample = random.sample(rows, k=min(args.n, len(rows)))
 
-    gates = Gates()
+    gates = Gates(
+        min_side_px=int(args.min_side_px),
+        min_area_px=int(args.min_area_px),
+        min_brightness=float(args.min_brightness),
+        max_brightness=float(args.max_brightness),
+        min_lap_var=float(args.min_lap_var),
+    )
 
-    out_jsonl = REPO / "reports" / "quality_eval.jsonl"
-    out_md = REPO / "reports" / "quality_eval.md"
+    out_jsonl = REPO / "reports" / f"{args.out_stem}.jsonl"
+    out_md = REPO / "reports" / f"{args.out_stem}.md"
     out_jsonl.parent.mkdir(parents=True, exist_ok=True)
 
     reasons = Counter()
@@ -187,8 +204,8 @@ def main() -> int:
                  "Foto tremida/desfocada. Apoie o celular, use temporizador e tente de novo." "\n")
 
     lines.append("\nArtifacts:\n")
-    lines.append(f"- reports/quality_eval.jsonl\n")
-    lines.append(f"- reports/quality_eval.md\n")
+    lines.append(f"- reports/{args.out_stem}.jsonl\n")
+    lines.append(f"- reports/{args.out_stem}.md\n")
 
     out_md.write_text("".join(lines), encoding="utf-8")
     return 0

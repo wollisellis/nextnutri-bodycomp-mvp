@@ -57,6 +57,10 @@ def main() -> int:
     status_pairs = Counter()
     full_status_counts = Counter()
 
+    # Examples for debugging deltas.
+    ex_roi_ok_full_no: list[dict] = []
+    ex_roi_no_full_ok: list[dict] = []
+
     # Cache full-image inference by file to reduce repeats.
     full_cache: dict[str, str] = {}
 
@@ -88,6 +92,12 @@ def main() -> int:
                 "roi_status": roi_status,
                 "full_status": full_status,
             }
+
+            if roi_status == "ok" and full_status == "no_pose" and len(ex_roi_ok_full_no) < 25:
+                ex_roi_ok_full_no.append(rec)
+            if roi_status == "no_pose" and full_status == "ok" and len(ex_roi_no_full_ok) < 25:
+                ex_roi_no_full_ok.append(rec)
+
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
     try:
