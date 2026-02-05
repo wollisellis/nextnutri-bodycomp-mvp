@@ -1,0 +1,13 @@
+[Unit]
+Description=NextNutri bodycomp autonomous worker
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/unienutri/.openclaw/workspace/nextnutri-bodycomp-mvp
+ExecStart=/bin/bash -lc 'cd /home/unienutri/.openclaw/workspace/nextnutri-bodycomp-mvp && . .venv/bin/activate && exec python3 scripts/worker/runner.py'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,5 +1,20 @@
+# Local datasets / artifacts
+/data/
+
+# Virtualenv
+.venv/
+
+# Python cache
 __pycache__/
 *.pyc
-.venv/
-.env
-.DS_Store
+
+# Reports (keep curated markdown reports; ignore volatile logs/state)
+/reports/*.jsonl
+/reports/*_error.txt
+/reports/outbox_telegram.txt
+/reports/worker_state.json
+/reports/watchdog_state.json
+/reports/worker_last_error.txt
+
+# Allow curated reports
+!/reports/*.md
