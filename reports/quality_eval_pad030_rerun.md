@@ -1,5 +1,5 @@
 # Quality gates — COCO ROI (sample)
-Sample: **1000**
+Sample: **2000**
 
 ## Current thresholds
 - min_side_px: 160
@@ -8,13 +8,13 @@ Sample: **1000**
 - min_lap_var: 80.0
 
 ## Results
-- ok: **247**
-- reject: **753**
+- ok: **519**
+- reject: **1481**
 
 ### Reject reasons
-- too_small: 733
-- too_dark: 18
-- too_blurry: 2
+- too_small: 1440
+- too_dark: 36
+- too_blurry: 5
 
 ## Suggested user-facing messages (PT-BR)
 - too_small: A pessoa está pequena no frame. Chegue mais perto e deixe o corpo inteiro visível.
@@ -23,5 +23,5 @@ Sample: **1000**
 - too_blurry: Foto tremida/desfocada. Apoie o celular, use temporizador e tente de novo.
 
 Artifacts:
-- reports/quality_eval.jsonl
-- reports/quality_eval.md
+- reports/quality_eval_pad030_rerun.jsonl
+- reports/quality_eval_pad030_rerun.md
