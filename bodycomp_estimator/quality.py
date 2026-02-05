@@ -19,8 +19,8 @@ class QualityGates:
     min_lap_var: float = 60.0
 
     # Pose-relative gates (computed after pose detection)
-    min_pose_bbox_area_ratio: float = 0.08  # person must occupy >=8% of image
-    min_pose_bbox_min_side_ratio: float = 0.35  # bbox min side >=35% of image min side
+    min_pose_bbox_area_ratio: float = 0.05  # person must occupy >=8% of image
+    min_pose_bbox_min_side_ratio: float = 0.28  # bbox min side >=35% of image min side
 
 
 def _to_gray(image_rgb: np.ndarray) -> np.ndarray:

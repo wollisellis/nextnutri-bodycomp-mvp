@@ -1,0 +1,5 @@
+{
+  "note": "Candidate defaults based on sweep. Update bodycomp_estimator/quality.py next.",
+  "min_side_px": 128,
+  "min_area_px": 16384
+}

@@ -1,25 +1,25 @@
 # COCO val2017 — Pose: ROI crops vs full image
 
-Rows (ROI bboxes): 1000
-Unique images: 750
+Rows (ROI bboxes): 213
+Unique images: 203
 
 ## ROI status counts
-- ok: 653
-- no_pose: 347
+- ok: 149
+- no_pose: 64
 
 ## Full-image status counts (for same images)
-- ok: 680
-- no_pose: 320
+- ok: 143
+- no_pose: 70
 
 ## ROI vs Full (pair counts)
-- roi=ok / full=ok: 507
-- roi=no_pose / full=no_pose: 174
-- roi=no_pose / full=ok: 173
-- roi=ok / full=no_pose: 146
+- roi=ok / full=ok: 114
+- roi=ok / full=no_pose: 35
+- roi=no_pose / full=no_pose: 35
+- roi=no_pose / full=ok: 29
 
 ## Deltas (interpretation)
-- ROI ok & full no_pose: 146
-- ROI no_pose & full ok: 173
+- ROI ok & full no_pose: 35
+- ROI no_pose & full ok: 29
 
 Artifacts:
 - reports/coco_val2017_pose_on_full_from_roi_sample.jsonl

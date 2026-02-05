@@ -25,6 +25,14 @@ app.add_middleware(
 pose_extractor = PoseExtractor(static_image_mode=True, model_complexity=1)
 
 
+def _quality_payload(ok: bool, reason: str, message_ptbr: str) -> dict:
+    return {
+        "quality_ok": ok,
+        "quality_reason": reason,
+        "quality_message_ptbr": message_ptbr,
+    }
+
+
 @app.get("/health")
 def health() -> dict:
     return {"ok": True}
@@ -52,22 +60,25 @@ async def estimate(
     # Fast quality gates before pose (blur/light).
     msg = quality_gate_message(image_rgb)
     if msg is not None:
-        raise HTTPException(status_code=422, detail=msg)
+        # structured detail for clients
+        raise HTTPException(status_code=422, detail=_quality_payload(False, 'precheck', msg))
 
     pose = pose_extractor.extract(image_rgb)
     if pose is None:
         raise HTTPException(
             status_code=422,
-            detail=(
-                "Não detectei pose. Use uma foto de corpo inteiro (cabeça aos pés), "
-                "bem iluminada, em pé, sem oclusões (braços colados no corpo ajudam)."
+            detail=_quality_payload(
+                False,
+                'no_pose',
+                ("Não detectei pose. Use uma foto de corpo inteiro (cabeça aos pés), "
+                 "bem iluminada, em pé, sem oclusões (braços colados no corpo ajudam)."),
             ),
         )
 
     # Post-pose gate: person too small in frame.
     msg2 = quality_gate_message(image_rgb, pose_xy_norm=pose.xy)
     if msg2 is not None:
-        raise HTTPException(status_code=422, detail=msg2)
+        raise HTTPException(status_code=422, detail=_quality_payload(False, 'too_small', msg2))
 
     sex_norm = sex.lower().strip()
     if sex_norm not in {"female", "male", "unknown"}:
