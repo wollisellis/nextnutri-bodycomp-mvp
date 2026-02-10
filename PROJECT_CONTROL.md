@@ -1,6 +1,11 @@
 # Faraday Ops — Controle de Projetos (GitHub)
 
-## Kanban (GitHub Project)
+## Kanban (visual) — Trello (recomendado)
+- Board: **Faraday Ops**
+- URL: https://trello.com/b/tZC0cpyh/faraday-ops
+- Colunas: Inbox / Todo / Doing / Done
+
+## Kanban (GitHub Project) — dev/issues
 - Project: **Faraday Ops**
 - URL: https://github.com/users/wollisellis/projects/3
 

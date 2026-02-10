@@ -1,0 +1,11 @@
+{
+  "boardName": "Faraday Ops",
+  "boardId": "698b6109920b75d319ff6e1a",
+  "boardUrl": "https://trello.com/b/tZC0cpyh/faraday-ops",
+  "lists": {
+    "Inbox": "698b6109d9f5d6f92ac7a871",
+    "Todo": "698b6109aab967ba41bd1bcf",
+    "Doing": "698b610a7767bcdcb46edb93",
+    "Done": "698b610a18d4cfa0d26176cc"
+  }
+}
