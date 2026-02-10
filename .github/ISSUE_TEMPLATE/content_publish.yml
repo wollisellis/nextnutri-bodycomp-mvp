@@ -1,0 +1,41 @@
+name: "Publicação — Telegram/IG"
+description: "Roteiro → checagem → assets → publicação"
+labels: ["content"]
+body:
+  - type: dropdown
+    id: channel
+    attributes:
+      label: Canal
+      options:
+        - Telegram
+        - Instagram
+        - Ambos
+    validations:
+      required: true
+
+  - type: textarea
+    id: hook
+    attributes:
+      label: Hook / Título
+      placeholder: "3 coisas que ninguém te contou sobre..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Fontes (se factual)
+      placeholder: "Links, prints, timestamps"
+
+  - type: textarea
+    id: assets
+    attributes:
+      label: Assets necessários
+      placeholder: "Imagem, vídeo, áudio, legendas, etc."
+
+  - type: textarea
+    id: approval
+    attributes:
+      label: Aprovação
+      description: "Se precisar revisão humana antes de publicar, diga o que precisa ser aprovado."
+      placeholder: "Aprovar texto final + cortes + fontes"

@@ -1,0 +1,29 @@
+name: "Finanças — CSV/Relatório"
+description: "Registrar, categorizar e gerar relatórios a partir de CSV (gastos/receitas)"
+labels: ["finance"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Tipo
+      options:
+        - Lançar/ajustar transações
+        - Relatório semanal/mensal
+        - Auditoria/categorias
+        - Outros
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto + arquivo(s)
+      placeholder: "Arquivo: financeiro_master.csv\nPeríodo: ...\nObjetivo: ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Saída esperada
+      placeholder: "Tabela por categoria + gráfico + 3 insights + próximos passos"

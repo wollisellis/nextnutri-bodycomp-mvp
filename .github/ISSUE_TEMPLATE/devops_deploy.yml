@@ -1,0 +1,34 @@
+name: "DevOps / Deploy"
+description: "Deploy, CI/CD, infra, observabilidade"
+labels: ["devops"]
+body:
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Escopo
+      options:
+        - Deploy app
+        - CI/CD
+        - Infra/segurança
+        - Observabilidade/monitoramento
+        - Outros
+    validations:
+      required: true
+
+  - type: textarea
+    id: changes
+    attributes:
+      label: Mudança desejada
+      placeholder: "O que exatamente precisa mudar?"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: risks
+    attributes:
+      label: Risco
+      options:
+        - label: Requer confirmação humana antes de executar comandos destrutivos
+          required: false
+        - label: Pode afetar produção
+          required: false

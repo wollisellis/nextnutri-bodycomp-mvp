@@ -1,0 +1,38 @@
+name: "PRISMA / Revisão Sistemática"
+description: "Pipeline de revisão científica (PRISMA-style): protocolo → busca → triagem → extração → síntese"
+labels: ["prisma", "research"]
+body:
+  - type: input
+    id: question
+    attributes:
+      label: Pergunta de pesquisa (1 frase)
+      placeholder: "Em adultos, medidas 2D de foto correlacionam com % gordura (DEXA)?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: pico
+    attributes:
+      label: PICO/PECO
+      description: População, Intervenção/Exposição, Comparador, Outcomes
+      placeholder: "P: ...\nI/E: ...\nC: ...\nO: ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: inclusion
+    attributes:
+      label: Critérios de inclusão/exclusão
+      placeholder: "Incluir: ...\nExcluir: ..."
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Bases e strings de busca
+      placeholder: "Bases: PubMed, Google Scholar, etc.\nStrings: (photo OR image) AND (DEXA OR DXA) AND ..."
+
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Entregáveis
+      placeholder: "- evidence_table.csv\n- claims_map.md\n- draft_v1.md\n- audit_report.md"

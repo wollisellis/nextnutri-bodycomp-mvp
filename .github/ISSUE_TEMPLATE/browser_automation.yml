@@ -1,0 +1,25 @@
+name: "Automação de Browser"
+description: "Automatizar coleta/checagem via navegador (Stagehand/Playwright)"
+labels: ["automation", "browser"]
+body:
+  - type: input
+    id: target
+    attributes:
+      label: URL / alvo
+      placeholder: "https://..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos esperados
+      placeholder: "1) abrir\n2) logar\n3) buscar X\n4) extrair Y"
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      placeholder: "CSV/JSON/screenshot/link"
