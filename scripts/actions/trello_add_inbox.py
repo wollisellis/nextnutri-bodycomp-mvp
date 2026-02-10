@@ -21,6 +21,18 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+
+def _openclaw_vars() -> dict:
+    """Read env vars from OpenClaw config (so scripts work without exported shell env)."""
+    p = Path.home() / ".openclaw" / "openclaw.json"
+    if not p.exists():
+        return {}
+    try:
+        cfg = json.loads(p.read_text(encoding="utf-8"))
+        return (cfg.get("env") or {}).get("vars") or {}
+    except Exception:
+        return {}
+
 TRELLO_API = "https://api.trello.com/1"
 
 
@@ -50,10 +62,12 @@ def main() -> int:
     ap.add_argument("--desc", default="")
     args = ap.parse_args()
 
-    key = os.getenv("TRELLO_API_KEY") or os.getenv("TRELLO_KEY")
-    token = os.getenv("TRELLO_TOKEN")
+    oc = _openclaw_vars()
+    # Prefer OpenClaw config over shell env to avoid stale exported tokens.
+    key = oc.get("TRELLO_API_KEY") or oc.get("TRELLO_KEY") or os.getenv("TRELLO_API_KEY") or os.getenv("TRELLO_KEY")
+    token = oc.get("TRELLO_TOKEN") or os.getenv("TRELLO_TOKEN")
     if not key or not token:
-        print("Missing TRELLO_API_KEY/TRELLO_TOKEN", file=sys.stderr)
+        print("Missing TRELLO_API_KEY/TRELLO_TOKEN (env or ~/.openclaw/openclaw.json)", file=sys.stderr)
         return 2
 
     cfg = _load_cfg()
